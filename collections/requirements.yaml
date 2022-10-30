@@ -1,0 +1,8 @@
+collections:
+    - name: ./collections/community.general-5.4.0.tar.gz
+  # - name: community-general
+
+    # - name: install general collection
+    #   source: ./collections//community-general-4.7.0.tar.gz
+    #   type: file
+

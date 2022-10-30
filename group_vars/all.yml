@@ -1,0 +1,13 @@
+---
+
+dns_suffix:
+  - abc.com.tr
+
+fqdn: abc.com.tr
+       
+dns_servers:
+  - 8.8.8.8
+  - 4.4.4.4
+  - 2.2.2.2
+
+media_server: 3.3.3.3

@@ -1,0 +1,150 @@
+---
+- name: Register Control and Fixed
+  block:
+   - name: Subscription Manager Status
+     shell: "subscription-manager list | grep -i status: | awk '{print $2}' | sed '2d'"
+     register: register_status
+     failed_when: register_status.stdout != "Subscribed"  
+     async: 50
+     poll: 1
+
+  rescue:
+   - name: Unregister
+     community.general.redhat_subscription:
+       state: absent
+     async: 20
+     poll: 2
+     ignore_errors: true
+
+   - name: Capture files to delete
+     find:
+        paths: /etc/yum.repos.d/
+        file_type: file
+        excludes:
+          - "redhat.repo"
+     register: found_files
+
+   - name: Copy 3.party repo files from to OLD directory
+     copy: remote_src=True src={{ item.path }} dest=/etc/yum.repos.d/OLD/
+     with_items: "{{ found_files['files'] }}"
+
+   - name: Delete 3.party repo files
+     file:
+       path: "{{ item.path }}"
+       state: absent
+     with_items: "{{ found_files['files'] }}"
+
+   - name: proxy disable
+     lineinfile:
+        path: /etc/yum.conf
+        state: absent
+        regexp: "{{ item }}"
+     with_items:
+        - '^proxy(.*)'
+ 
+   - name: proxy disable
+     lineinfile:
+       path: /etc/rhsm/rhsm.conf
+       state: absent
+       regexp: "{{ item }}"
+     with_items:
+       - '^proxy(.*)'
+ 
+   - name: clean cache and repos
+     shell: rm -rf /var/cache/dnf/*
+     when:
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version == "8"
+     ignore_errors: true
+   - name: clean cache and repos
+     shell: rm -rf /var/cache/yum/*
+     when:
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version == "7"
+     ignore_errors: true
+   - name: yum-clean-cache
+     command: yum clean all
+     async: 15
+     ignore_errors: true
+     args:
+       warn: no
+    
+   - name: Registration For RHEL6
+     community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ act_rhel6_key }}"
+        org_id:  "{{ sat_org }}"
+        force_register: yes
+     async: 20
+     poll: 2
+     ignore_errors: true
+     when:
+       - ansible_distribution == "RedHat"
+       - ansible_distribution_major_version == "6"
+
+   - name: Registration For RHEL7
+     community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ act_rhel7_key }}"
+        org_id: "{{ sat_org }}"
+        force_register: yes
+     async: 20
+     poll: 2
+     ignore_errors: true
+     when:
+      - ansible_distribution == "RedHat"
+      - ansible_distribution_major_version == "7"
+ 
+   - name: Registration For RHEL8
+     community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ act_rhel8_key }}"
+        org_id:  "{{ sat_org }}"
+        force_register: yes
+        # release: 8
+     async: 20
+     poll: 2 
+     ignore_errors: true
+     when:
+      - ansible_distribution == "RedHat"
+      - ansible_distribution_major_version == "8"
+ 
+   - name: Registration attach
+     shell: subscription-manager attach --auto
+     async: 20
+     poll: 2
+     when:
+       - ansible_distribution == "RedHat"
+       - ansible_distribution_major_version|int >= 6
+     ignore_errors: true   
+
+   - name: Subscription Manager Status
+     shell: "subscription-manager list | grep -i status: | awk '{print $2}' | sed '2d'"
+     register: register_status
+     async: 50
+     poll: 1
+
+  always:
+    - name: workspace global variable register_failed empty
+      set_stats:
+        data: 
+          register_failed: "{{ ansible_play_hosts_all|difference(ansible_play_hosts) }}"
+
+    - name: workspace global variable  register_failed
+      set_stats:
+        data: 
+          register_failed: ["{{ inventory_hostname }}" ] 
+      when: register_status.stdout != "Subscribed"  
+      ignore_errors: true
+
+    - name: workspace global variable  register_success
+      set_stats:
+        data: 
+          register_success: ["{{ inventory_hostname }}"]
+      when: register_status.stdout == "Subscribed" 
+      ignore_errors: true  
+
+    - name: "Print execution results"
+      debug:
+        msg: "{{ register_status.stdout }}"
+ 

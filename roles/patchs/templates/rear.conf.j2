@@ -1,0 +1,9 @@
+OUTPUT=ISO
+BACKUP=NETFS
+BACKUP_URL=nfs://nfsaserver.abc.com.tr/osbackup
+ONLY_INCLUDE_VG=( "vgroot" )
+USE_CFG2HTML=y
+NETFS_KEEP_OLD_BACKUP_COPY=yes
+export TMPDIR="/root/"
+BACKUP_PROG_EXCLUDE=( "${BACKUP_PROG_EXCLUDE[@]}"'/oracle/*' '/data*' '/grid/*' '/tmp/*' )
+COPY_AS_IS_EXCLUDE=( ${COPY_AS_IS_EXCLUDE[@]} '/dev/vx/*'  '/dev/watchdog*')

@@ -1,0 +1,21 @@
+---
+#Snapshot for VMware Platform
+  vcenter_host: 
+    - vhost01.com.tr
+    - vhost02.com.tr
+
+# Patch type
+  patch_state: sec
+
+# Mail notification
+  mail_server: ABC.XYZ.com.tr
+
+# Redhat Satellite Register
+  sat_fqdn: xyz.com.tr
+  act_rhel8_key: Prod_8x
+  act_rhel7_key: Prod_7x
+  act_rhel6_key: Prod_6x
+  sat_org: xyz
+
+  fqdn: abc.com.tr
+  media_server: 3.3.3.3

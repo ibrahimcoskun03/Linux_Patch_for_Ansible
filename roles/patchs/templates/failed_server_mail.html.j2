@@ -1,0 +1,32 @@
+
+<p>Merhaba,</p>
+<p>&nbsp; &nbsp; &nbsp;Aşağıdaki sunucularda Job fail olmuştur. Gerekli kontrolleri yapmanız gerekmektedir.</p>
+
+
+<h3> Failed Sunucular: </h3> 
+<br>
+
+</table>
+
+<table style="border-collapse: collapse; width: 100%;" border="1">
+<tbody>
+<tr>
+  <td style="width: 20%;">Sunucu Admin</td>
+  <td style="width: 20%;">Sunucu Hostname</td>
+  <td style="width: 20%;">IP adresi</td>
+  <td style="width: 20%;">Isletim Sistemi</td>
+  <td style="width: 20%;">Isletim Sistemi  Versiyonu</td>
+  <td style="width: 20%;">Sunucu Tipi</td>
+</tr>
+  {%  for host in ansible_play_hosts_all %}
+<tr>
+  <td style="width: 20%;">{{ admin }}</td>
+  <td style="width: 20%;">{{ hostvars[host].ansible_fqdn }}</td>
+  <td style="width: 20%;">{{ hostvars[host].ansible_default_ipv4.address }}</td>
+  <td style="width: 20%;">{{ hostvars[host].ansible_distribution }}</td>
+  <td style="width: 20%;">{{ hostvars[host].ansible_distribution_version }}</td>
+  <td style="width: 20%;">{{ hostvars[host].ansible_product_name }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>

@@ -1,0 +1,27 @@
+---
+# tasks file for patch
+
+  - import_tasks: 01_take-snapshot-patch.yml
+    become: false
+    tags:
+       - patch::take-snapshot-patch 
+
+  - import_tasks: 02_Register_control_and_Fixed.yml
+    tags:
+      - patch::Register_controlandFixed
+
+  - import_tasks: 03_Patch_Update.yml
+    tags:
+      - patch::Patch_Update
+
+  - import_tasks: 04_virtual_or_physical.yml
+    tags:
+      - patch::Virtual_or_physical
+
+  - import_tasks: 05_post-update_mail.yml
+    tags:
+      - patch::post-update_mail
+
+  - import_tasks: 06_Failed_mail.yml
+    tags:
+      - patch::failed_mail

@@ -1,0 +1,7 @@
+---
+
+- hosts: "{{ register_success }}"
+  gather_facts: yes
+
+  roles:
+    - { role: patchs  }   

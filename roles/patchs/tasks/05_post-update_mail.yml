@@ -1,0 +1,14 @@
+---
+    - name: SendMail
+      mail: 
+        host: "{{ mail_server }}" 
+        port: 587
+        from: "{{ admin }}" 
+        subject: Patch Sonrası Bilgilendirme
+        to: "{{ con_name }}"
+        cc: "{{ admin }}"
+        body: "{{ lookup('template','templates/post-update mail.html.j2') }}"
+        subtype: html
+        charset: utf8
+      run_once: true
+      delegate_to: localhost
