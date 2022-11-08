@@ -1,1 +1,0 @@
-# Linux Patch Management with Ansible
