@@ -1,0 +1,4 @@
+#Snapshot for VMware Platform
+  vcenter_host: 
+    - vhost01.com.tr
+    - vhost02.com.tr

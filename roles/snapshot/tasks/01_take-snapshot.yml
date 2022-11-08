@@ -1,0 +1,48 @@
+---
+
+- name: Find Guest's Folder using name
+  community.vmware.vmware_guest_find:
+    hostname: "{{ item[1] }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    name: "{{ item[0] }}"
+    validate_certs: no
+  delegate_to: localhost
+  ignore_errors: yes
+  with_nested: 
+    - "{{ guest_name }}"
+    - "{{ vcenter_host }}"
+  register: vm_folder
+
+- set_fact:
+    folder={{ vm_folder.results[1].folders[0] }}
+  when: vm_folder.results[1].folders is defined
+ 
+- name: Create a snapshot on {{ item.invocation.module_args.hostname }}
+  vmware_guest_snapshot: 
+    hostname: "{{ item.invocation.module_args.hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ item.invocation.module_args.hostname }}"
+    folder: "{{item.folders[0]}}"
+    name: "{{item.invocation.module_args.name}}"
+    state: "{{state}}"
+    snapshot_name: "{{ snapshot_name }}"
+    description: "{{ description }}"
+    validate_certs: no
+  ignore_errors: yes
+  delegate_to: localhost
+  when: item.folders is defined
+  with_items: "{{ vm_folder.results }}"
+  register: snap
+
+- name: Check succeed snaphosts
+  debug:
+    msg: Snapshot Alınmıştır  "{{ item.invocation.module_args.name }}"
+  when: 
+    - state == "present"
+    - item.snapshot_results is defined
+  loop: "{{ snap.results }}"
+  loop_control:
+    label: "{{ item.invocation.module_args.name if item.invocation is defined else 'skipped'  }}"
+  ignore_errors: yes

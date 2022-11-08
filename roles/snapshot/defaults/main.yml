@@ -1,0 +1,11 @@
+---
+# Satellite Server Information
+
+  sat_fqdn: xyz.com.tr
+  act_rhel8_key: Prod_8x
+  act_rhel7_key: Prod_7x
+  act_rhel6_key: Prod_6x
+  sat_org: xyz
+
+  fqdn: abc.com.tr
+  media_server: 3.3.3.3
